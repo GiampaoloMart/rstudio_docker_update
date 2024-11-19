@@ -29,11 +29,11 @@ RUN apt-get update && apt-get install -y \
     libgit2-dev \
     && apt-get clean
 
+# Increase make jobs for better performance (root user)
+RUN echo "MAKEFLAGS=-j4" >> /usr/local/lib/R/etc/Renviron.site
+
 # Switch back to default user for RStudio
 USER rstudio
-
-# Increase make jobs for better performance
-RUN echo "MAKEFLAGS=-j4" >> /usr/local/lib/R/etc/Renviron.site
 
 # Install Bioconductor package manager
 RUN R -e "install.packages('BiocManager', repos='http://cran.r-project.org')"
