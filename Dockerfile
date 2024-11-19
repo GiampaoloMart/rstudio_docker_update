@@ -1,15 +1,12 @@
 FROM ghcr.io/giampaolomart/rstudio_docker:nightly
 
-# Set environment variables for R
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Install the Bioconductor package manager (BiocManager)
 RUN R -e "install.packages('BiocManager')"
 
-# Install the R packages including scDblFinder
+# Install the R packages, including scDblFinder and its dependencies
 RUN R -e "BiocManager::install(c('Rhtslib', 'Rsamtools', 'GenomicAlignments', 'rtracklayer', 'scDblFinder'))"
 
-# Verify the installation
+# Verify installation of the required packages
 RUN R -e "library(scDblFinder); library(Rsamtools); library(rtracklayer); library(GenomicAlignments)"
 
 # Expose RStudio port
