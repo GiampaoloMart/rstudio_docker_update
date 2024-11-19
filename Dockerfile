@@ -22,15 +22,15 @@ RUN apt-get update && apt-get install -y \
     patch \
     libglpk-dev \
     build-essential \
-    liblzma-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libxml2-dev \
-    libgit2-dev \
+    libbz2-dev \
+    autoconf \
+    libtool \
+    pkg-config \
     && apt-get clean
 
-# Increase make jobs for better performance (root user)
-RUN echo "MAKEFLAGS=-j4" >> /usr/local/lib/R/etc/Renviron.site
+# Set environment paths for building libraries
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 # Switch back to default user for RStudio
 USER rstudio
@@ -38,15 +38,17 @@ USER rstudio
 # Install Bioconductor package manager
 RUN R -e "install.packages('BiocManager', repos='http://cran.r-project.org')"
 
-# Install necessary Bioconductor packages
-RUN R -e "BiocManager::install(c('Rhtslib', 'Rsamtools', 'GenomicAlignments', 'rtracklayer'), ask = FALSE, verbose = TRUE)"
-
-# Install scDblFinder (after dependencies are installed)
-RUN R -e "BiocManager::install('scDblFinder', ask = FALSE, verbose = TRUE)"
+# Install dependencies sequentially
+RUN R -e "BiocManager::install('Rhtslib', ask = FALSE, verbose = TRUE)" && \
+    R -e "BiocManager::install('Rsamtools', ask = FALSE, verbose = TRUE)" && \
+    R -e "BiocManager::install('GenomicAlignments', ask = FALSE, verbose = TRUE)" && \
+    R -e "BiocManager::install('rtracklayer', ask = FALSE, verbose = TRUE)" && \
+    R -e "BiocManager::install('scDblFinder', ask = FALSE, verbose = TRUE)"
 
 # Expose RStudio port
 EXPOSE 8787
 
 # Default command to start RStudio
 CMD ["/init"]
+
 
