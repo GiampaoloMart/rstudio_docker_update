@@ -14,13 +14,11 @@ USER rstudio
 
 # Install Bioconductor package manager (BiocManager) and required packages
 RUN R -e "install.packages('BiocManager', repos='http://cran.r-project.org')"
-RUN R -e "BiocManager::install(c('Rsamtools', 'GenomicAlignments', 'rtracklayer', 'scDblFinder'))"
-
-# Verify installation by loading libraries
-RUN R -e "library(Rsamtools); library(GenomicAlignments); library(rtracklayer); library(scDblFinder)"
+RUN R -e "BiocManager::install(c('Rhtslib', 'Rsamtools', 'GenomicAlignments', 'rtracklayer', 'scDblFinder'))"
 
 # Expose RStudio port
 EXPOSE 8787
 
 # Set the default command to start RStudio Server
 CMD ["/init"]
+
